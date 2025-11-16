@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,12 +13,12 @@ import type { EdgeInsets } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AppleInvite from './screen/AppleInvite';
-
+const LogoImage = require('./assets/logo.png');
 type MainScreenProps = {
   safeAreaInsets?: EdgeInsets;
 };
 
-const HERO_IMAGE_URI = 'https://reactnative.dev/img/tiny_logo.png';
+const HERO_IMAGE_URI = LogoImage;
 type ListOfNavigation = {
   id: number;
   title: string;
@@ -32,11 +32,11 @@ const listOfNavigation: ListOfNavigation[] = [
     title: 'Apple invite carosel onboarding',
     link: 'AppleInvite',
     category: 'Onboarding',
-    description: 'A polished onboarding inspired by the Apple event invite animation.',
+    description:
+      'A polished onboarding inspired by the Apple event invite animation.',
   },
 ];
 
-// In App.js in a new project
 
 function HomeScreen({ navigation }: any) {
   const isDarkMode = useColorScheme() === 'dark';
@@ -46,6 +46,52 @@ function HomeScreen({ navigation }: any) {
   const cardBackground = isDarkMode ? '#11141c' : '#ffffff';
   const accentColor = isDarkMode ? '#6ce2df' : '#2563eb';
   const [activeTab, setActiveTab] = useState('All');
+  const spinAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    spinAnim.setValue(0);
+    pulseAnim.setValue(0);
+    const spinLoop = Animated.loop(
+      Animated.timing(spinAnim, {
+        toValue: 1,
+        duration: 6000,
+        useNativeDriver: true,
+      }),
+    );
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 0,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    spinLoop.start();
+    pulseLoop.start();
+
+    return () => {
+      spinLoop.stop();
+      pulseLoop.stop();
+    };
+  }, [spinAnim, pulseAnim]);
+
+  const heroRotation = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const heroScale = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.08],
+  });
   const tabs = useMemo(() => {
     const uniqueCategories = Array.from(
       new Set(listOfNavigation.map(item => item.category)),
@@ -106,42 +152,19 @@ function HomeScreen({ navigation }: any) {
         <Text style={[styles.subheading, { color: secondaryTextColor }]}>
           Explore curated animation demos and interaction patterns.
         </Text>
-        <Image
+        <Animated.Image
           accessibilityRole="image"
           accessibilityLabel="React Native logo"
           resizeMode="contain"
-          source={{ uri: HERO_IMAGE_URI }}
-          style={styles.heroImage}
+          source={HERO_IMAGE_URI}
+          style={[
+            styles.heroImage,
+            {
+              transform: [{ rotate: heroRotation }, { scale: heroScale }],
+            },
+          ]}
         />
-        <View style={styles.tabBar}>
-          {tabs.map(tab => {
-            const isActive = tab === activeTab;
-            return (
-              <TouchableOpacity
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                style={[
-                  styles.tabButton,
-                  {
-                    borderColor: isActive ? accentColor : 'transparent',
-                    backgroundColor: isActive
-                      ? `${accentColor}22`
-                      : 'transparent',
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.tabButtonLabel,
-                    { color: isActive ? accentColor : secondaryTextColor },
-                  ]}
-                >
-                  {tab}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        
 
         <FlatList
           data={filteredNavigation}
@@ -202,6 +225,7 @@ const styles = StyleSheet.create({
   heroImage: {
     width: 220,
     height: 220,
+    // tintColor: '#61dafb',
     marginBottom: 24,
   },
   tabBar: {
