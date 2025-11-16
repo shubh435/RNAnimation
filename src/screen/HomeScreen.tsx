@@ -32,6 +32,14 @@ const listOfNavigation: ListOfNavigation[] = [
     description:
       'A polished onboarding inspired by the Apple event invite animation.',
   },
+  {
+    id: 2,
+    title: 'Circular slider with carousel',
+    link: 'CircularSlider',
+    category: 'Onboarding',
+    description:
+      'An engaging circular slider combined with a carousel effect for onboarding screens.',
+  },
 ];
 
 function HomeScreen({ navigation }: any) {
@@ -181,6 +189,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    paddingTop: 32,
   },
   content: {
     flexGrow: 1,
