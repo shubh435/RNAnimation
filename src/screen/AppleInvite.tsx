@@ -101,7 +101,7 @@ const AppleInvite = () => {
     offset: SharedValue<number>;
   }) => {
     const _styles = useAnimatedStyle(() => {
-      const itemPosition = index * _itemSize - width / 2 + _itemSize / 2;
+      const itemPosition = index * _itemSize - width / 2 - _itemSize / 2;
       const totalSize = imagesJson.length * _itemSize;
       const range =
         ((itemPosition - (offset.value + totalSize * 1000)) % totalSize) +
@@ -157,7 +157,7 @@ const AppleInvite = () => {
           />
         </View>
 
-        <Marquee spacing={_spacing} position={offset}>
+        <Marquee spacing={_spacing} position={offset} speed={0.5}>
           <Animated.View
             style={{ flexDirection: 'row', gap: _spacing }}
             entering={marqueeEntering}
