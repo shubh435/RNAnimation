@@ -40,6 +40,14 @@ const listOfNavigation: ListOfNavigation[] = [
     description:
       'An engaging circular slider combined with a carousel effect for onboarding screens.',
   },
+  {
+    id: 2,
+    title: 'Onboarding pagination indicator',
+    link: 'PaginationIndicator',
+    category: 'Onboarding',
+    description:
+      'A sleek pagination indicator for onboarding flows, enhancing user navigation.',
+  },
 ];
 
 function HomeScreen({ navigation }: any) {
@@ -96,12 +104,7 @@ function HomeScreen({ navigation }: any) {
     inputRange: [0, 1],
     outputRange: [1, 1.08],
   });
-  const tabs = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(listOfNavigation.map(item => item.category)),
-    );
-    return ['All', ...uniqueCategories];
-  }, []);
+
   const filteredNavigation = useMemo(() => {
     if (activeTab === 'All') {
       return listOfNavigation;
@@ -257,6 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 8,
+    textTransform: 'capitalize',
   },
   navCardDescription: {
     fontSize: 14,
